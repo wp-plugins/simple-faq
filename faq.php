@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Simply FAQ
-Plugin URI: http://wwww.jasinski.us/faq/
+Plugin URI: http://www.jasinski.us/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
 Version: 0.01
 Author: Slawomir Jasinski

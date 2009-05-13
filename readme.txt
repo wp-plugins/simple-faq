@@ -4,7 +4,6 @@ Donate link: http://www.jasinski.us/simple-faq/
 Tags: faq, question, answer
 Requires at least: 2.7
 Tested up to: 2.7
-Stable tag: 0.1
 
 Simple FAQ gives you ability to create very simple FAQ on your site (questions and answers)
 
@@ -20,4 +19,4 @@ Simple FAQ gives you ability to create very simple FAQ on your site (questions a
 
 == Screenshots ==
 
-1. /tags/0.1/screenshot-1.png
+1. screenshot-1.png
