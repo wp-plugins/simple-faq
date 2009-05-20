@@ -3,7 +3,7 @@ Contributors: Slawomir Jasinski
 Donate link: http://www.jasinski.us/simple-faq/
 Tags: faq, question, answer
 Requires at least: 2.7
-Tested up to: 2.7
+Tested up to: 2.7.1
 
 Simple FAQ gives you ability to create very simple FAQ on your site (questions and answers)
 
@@ -19,4 +19,15 @@ Simple FAQ gives you ability to create very simple FAQ on your site (questions a
 
 == Screenshots ==
 
-1. screenshot-1.png
+1. admin panel
+
+== Changes ==
+
+20/05/2009
+- version 0.2
+- fixed bug with bad url to icons
+- fixed encoding
+- updated queries for current_user
+
+13/05/2009
+- first release v 0.1

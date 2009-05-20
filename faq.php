@@ -3,7 +3,7 @@
 Plugin Name: Simply FAQ
 Plugin URI: http://www.jasinski.us/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
-Version: 0.01
+Version: 0.2
 Author: Slawomir Jasinski
 Author URI: http://www.jasinski.us
 
@@ -24,7 +24,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-$faq_db_version = "0.1";
+$faq_db_version = "0.2";
 
 function faq_install () {
    global $wpdb;
@@ -40,8 +40,7 @@ function faq_install () {
 	`question` TEXT NOT NULL ,
 	`answer_date` DATE NOT NULL ,
 	`answer` TEXT NOT NULL
-	);";
-
+	) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
       require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
       dbDelta($sql);
@@ -96,6 +95,7 @@ function DisplayFAQ() {
 function faq_main() {
    echo '<div class="wrap">';
    echo '<h2>Simple FAQ</h2>';
+
    switch ($_REQUEST["act"]) {
       case 'edit':
 	 $msg = faq_form('update', $_REQUEST['id']);
@@ -164,11 +164,12 @@ function faq_update($data) {
  * insert new entry into database
  */
 function faq_insert($data) {
-    global $wpdb;
+    global $wpdb, $current_user;
+
     $table_name = $wpdb->prefix . "faq";
     $wpdb->insert( $table_name,
-		  array( 'question' => $data['question'], 'answer' => $data['answer']),
-		  array( '%s', '%s' ) );
+		  array( 'question' => $data['question'], 'answer' => $data['answer'], 'author_id' => $current_user->ID),
+		  array( '%s', '%s', '%d' ) );
     $msg = __("Entry added");
     return $msg;
 }
@@ -178,7 +179,7 @@ function faq_insert($data) {
  */
 function draw_ico($text, $gfx, $url) {
    $m = '<a href="' .$_SERVER['REQUEST_URI']. $url . '">';
-   $m .= '<img src="../wp-content/plugins/faq/gfx/' . $gfx .'" width="18" height="18" alt="+" align="middle"/> ' . $text . '</a>';
+   $m .= '<img src="../wp-content/plugins/simple-faq/gfx/' . $gfx .'" width="18" height="18" alt="+" align="middle"/> ' . $text . '</a>';
    return $m;
 }
 
