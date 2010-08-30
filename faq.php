@@ -1,13 +1,14 @@
 <?php
 /*
-Plugin Name: Simply FAQ
+Plugin Name: Simple FAQ
 Plugin URI: http://www.jasinski.us/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
-Version: 0.2
+Version: 0.3
 Author: Slawomir Jasinski
 Author URI: http://www.jasinski.us
+License: GPL2
 
-Copyright 2009 Slawomir Jasinski  (email : slav123@gmail.com)
+Copyright 2009-2010 Slawomir Jasinski  (email : slav123@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +25,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-$faq_db_version = "0.2";
+$faq_db_version = "0.3";
 
 function faq_install () {
    global $wpdb;
@@ -59,7 +60,7 @@ function faq_install () {
    register_activation_hook(__FILE__,'faq_install');
 
 /**
- * @name Displa FAQ
+ * @name Display FAQ
  */
 
 function DisplayFAQ() {
@@ -71,8 +72,8 @@ function DisplayFAQ() {
 
     $buf = '<ol>';
     foreach ($all_faq as $q) {
-	$buf .= '<li><i>' . $q->question . '</i><br/>';
-	$buf .= $q->answer.'</li>';
+	$buf .= '<li>' . format_to_post( $q->question ). '<br/>';
+	$buf .= format_to_post( $q->answer ).'</li>';
     }
     $buf .= '</ol>';
 
@@ -88,7 +89,8 @@ function DisplayFAQ() {
 
     // rejestracja menu
     function FAQ_menu() {
-	add_submenu_page('plugins.php', 'FAQ list', 'FAQ', 8, basename(__FILE__), 'faq_main');
+	//add_submenu_page('plugins.php', 'FAQ list', 'Simple FAQ', 8, basename(__FILE__), 'faq_main');
+	add_submenu_page( 'plugins.php', 'Simple FAQ', 'Simple FAQ', 'manage_options', basename(__FILE__), 'faq_main');
     }
     add_action('admin_menu', 'faq_menu');
 
@@ -96,35 +98,39 @@ function faq_main() {
    echo '<div class="wrap">';
    echo '<h2>Simple FAQ</h2>';
 
-   switch ($_REQUEST["act"]) {
-      case 'edit':
-	 $msg = faq_form('update', $_REQUEST['id']);
-      break;
-
-      case 'new':
-	 $msg = faq_form('insert');
-      break;
-
-      case 'delete':
-         $msg = faq_delete($_REQUEST['id']);
-      break;
-
-      case 'update':
-         $msg = faq_update($_POST);
-      break;
-
-      case 'insert':
-         $msg = faq_insert($_POST);
-      break;
-
-      case 'view':
-	 faq_view($_REQUEST['id']);
-      break;
-
-      default:
-         faq_list();
-      break;
-   }
+   if (isset($_REQUEST["act"]))
+      switch ($_REQUEST["act"]) {
+	 case 'edit':
+	    $msg = faq_form('update', $_REQUEST['id']);
+	 break;
+   
+	 case 'new':
+	    $msg = faq_form('insert');
+	 break;
+   
+	 case 'delete':
+	    $msg = faq_delete($_REQUEST['id']);
+	 break;
+   
+	 case 'update':
+	    $msg = faq_update($_POST);
+	 break;
+   
+	 case 'insert':
+	    $msg = faq_insert($_POST);
+	 break;
+   
+	 case 'view':
+	    faq_view($_REQUEST['id']);
+	 break;
+   
+	 default:
+	    faq_list();
+	 break;
+      }
+   else
+      faq_list();
+   
    if (!empty($msg)) {
       echo '<p>' . draw_ico('back to list', 'Backward.png', 'plugins.php?page=faq') . '</p>';
       _e("Message: ") ;
@@ -213,7 +219,7 @@ function faq_list() {
     $buf = '<tr>';
     foreach ($all_faq as $q) {
 	echo '<tr>';
-	echo '<td>'.$el.'' . $q->question . '</td>';
+	echo '<td>' . $q->question . '</td>';
 	echo '<td>' . draw_ico('', 'tool.png', '&amp;id=' . $q->id . '&amp;act=edit') . '</td>';
 	echo '<td>' . draw_ico('', 'zoom.png', '&amp;id=' . $q->id . '&amp;act=view') . '</td>';
 	echo '<td>' . draw_ico('', 'del.png', '&amp;id=' . $q->id . '&amp;act=delete') . '</td>';
@@ -256,7 +262,7 @@ function faq_form($act, $id = null) {
     <input type="hidden" name="act" value="<?= $act ?>"/>
 
     <p><?php _e("Question:", 'mt_trans_domain' ); ?><br/>
-    <input type="text" name="question" value="<?=$row->question; ?>" size="20" class="regular-text">
+    <input type="text" name="question" value="<?= $row->question; ?>" size="20" class="regular-text">
     <p><?php _e("Answer:", 'mt_trans_domain' ); ?><br/>
     <textarea name="answer" rows="10" cols="30" class="large-text"><?= $row->answer; ?></textarea>
     </p><hr />
