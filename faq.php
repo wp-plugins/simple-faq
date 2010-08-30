@@ -198,17 +198,15 @@ function faq_list() {
    $table_name = $wpdb->prefix . "faq";
 
    echo '<h3>List of entries.</h3>';
-   echo '<p>';
-   echo draw_ico('add new entry', 'add.png', '&amp;act=new');
-   echo '</a></p>';
-
-
+   echo '<p><a href="plugins.php?page=faq.php&act=new" class="button add-new-h2">Add New</a>';
+  
    $select = "SELECT id, question, answer FROM " . $table_name ." ORDER BY answer_date DESC";
    $all_faq = $wpdb->get_results($select);
 
    ?><table class="widefat">
    <thead>
       <th scope="col"><? _e("Question") ?></th>
+      <th scope="col"><? _e("Answer") ?></th>
       <th scope="col" width="30"><? _e("Edit") ?></th>
       <th scope="col" width="30"><? _e("View"); ?></th>
       <th scope="col" width="30"><? _e("Delete");?></th>
@@ -219,7 +217,8 @@ function faq_list() {
     $buf = '<tr>';
     foreach ($all_faq as $q) {
 	echo '<tr>';
-	echo '<td>' . $q->question . '</td>';
+	echo '<td>' . stripslashes($q->question) . '</td>';
+	echo '<td>' . stripslashes($q->answer) . '</td>';
 	echo '<td>' . draw_ico('', 'tool.png', '&amp;id=' . $q->id . '&amp;act=edit') . '</td>';
 	echo '<td>' . draw_ico('', 'zoom.png', '&amp;id=' . $q->id . '&amp;act=view') . '</td>';
 	echo '<td>' . draw_ico('', 'del.png', '&amp;id=' . $q->id . '&amp;act=delete') . '</td>';
@@ -262,13 +261,13 @@ function faq_form($act, $id = null) {
     <input type="hidden" name="act" value="<?= $act ?>"/>
 
     <p><?php _e("Question:", 'mt_trans_domain' ); ?><br/>
-    <input type="text" name="question" value="<?= stripslashes($row->question); ?>" size="20" class="regular-text">
+    <input type="text" name="question" value="<? if (!empty($row->question)) echo stripslashes($row->question); ?>"  class="regular-text">
     <p><?php _e("Answer:", 'mt_trans_domain' ); ?><br/>
-    <textarea name="answer" rows="10" cols="30" class="large-text"><?= stripslashes($row->answer); ?></textarea>
+    <textarea name="answer" rows="10" cols="30" class="large-text"><? if (!empty($row->answer)) echo stripslashes($row->answer); ?></textarea>
     </p><hr />
 
     <p class="submit">
-    <input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" />
+    <input type="button" onclick="document.location.href='plugins.php?page=faq.php'" value="&#171; <?php _e("Back") ?>" class="button"/> <input type="reset" name="Reset" value="<?php _e('Cancel Changes') ?>" class="button" /> <input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" />
     </p>
 
     </form>

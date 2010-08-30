@@ -26,7 +26,8 @@ Simple FAQ gives you ability to create very simple FAQ on your site (questions a
 30/08/2010
 - version 0.3
 - 3.x compatibility
-- fixed small bugs
+- fixed small bugs (strips slashes etc)
+- small graphic changes
 
 20/05/2009
 - version 0.2
