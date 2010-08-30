@@ -72,8 +72,8 @@ function DisplayFAQ() {
 
     $buf = '<ol>';
     foreach ($all_faq as $q) {
-	$buf .= '<li>' . format_to_post( $q->question ). '<br/>';
-	$buf .= format_to_post( $q->answer ).'</li>';
+	$buf .= '<li>' . stripslashes( $q->question ). '<br/>';
+	$buf .= '<span>' . stripslashes( $q->answer ).'</span></li>';
     }
     $buf .= '</ol>';
 
@@ -262,9 +262,9 @@ function faq_form($act, $id = null) {
     <input type="hidden" name="act" value="<?= $act ?>"/>
 
     <p><?php _e("Question:", 'mt_trans_domain' ); ?><br/>
-    <input type="text" name="question" value="<?= $row->question; ?>" size="20" class="regular-text">
+    <input type="text" name="question" value="<?= stripslashes($row->question); ?>" size="20" class="regular-text">
     <p><?php _e("Answer:", 'mt_trans_domain' ); ?><br/>
-    <textarea name="answer" rows="10" cols="30" class="large-text"><?= $row->answer; ?></textarea>
+    <textarea name="answer" rows="10" cols="30" class="large-text"><?= stripslashes($row->answer); ?></textarea>
     </p><hr />
 
     <p class="submit">
