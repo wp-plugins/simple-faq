@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Simple FAQ
-Plugin URI: http://www.jasinski.us/simple-faq/
+Plugin URI: http://www.spidersoft.com.au/2010/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
 Version: 0.3
 Author: Slawomir Jasinski
-Author URI: http://www.jasinski.us
+Author URI: http://www.spidersoft.com.au/
 License: GPL2
 
 Copyright 2009-2010 Slawomir Jasinski  (email : slav123@gmail.com)
@@ -103,34 +103,34 @@ function faq_main() {
 	 case 'edit':
 	    $msg = faq_form('update', $_REQUEST['id']);
 	 break;
-   
+
 	 case 'new':
 	    $msg = faq_form('insert');
 	 break;
-   
+
 	 case 'delete':
 	    $msg = faq_delete($_REQUEST['id']);
 	 break;
-   
+
 	 case 'update':
 	    $msg = faq_update($_POST);
 	 break;
-   
+
 	 case 'insert':
 	    $msg = faq_insert($_POST);
 	 break;
-   
+
 	 case 'view':
 	    faq_view($_REQUEST['id']);
 	 break;
-   
+
 	 default:
 	    faq_list();
 	 break;
       }
    else
       faq_list();
-   
+
    if (!empty($msg)) {
       echo '<p>' . draw_ico('back to list', 'Backward.png', 'plugins.php?page=faq') . '</p>';
       _e("Message: ") ;
@@ -148,7 +148,7 @@ function faq_delete($id) {
 
    $results = $wpdb->query("DELETE FROM " . $table_name . " WHERE id='$id'");
    if ($results) {
-      $msg = __("FAQ entry was suceffuly deleted.");
+      $msg = __("FAQ entry was successfully deleted.");
    }
    return $msg;
 }

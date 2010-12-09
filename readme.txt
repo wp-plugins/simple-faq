@@ -1,9 +1,9 @@
 === Simple FAQ ===
-Contributors: Slawomir Jasinski
-Donate link: http://www.jasinski.us/simple-faq/
+Contributors: SpiderSoft
+Donate link: http://www.spidersoft.com.au/2010/simple-faq/
 Tags: faq, question, answer
 Requires at least: 2.7
-Tested up to: 3.0.1
+Tested up to: 3.0.3
 
 Simple FAQ gives you ability to create very simple FAQ on your site (questions and answers)
 
@@ -22,6 +22,8 @@ Simple FAQ gives you ability to create very simple FAQ on your site (questions a
 1. admin panel
 
 == Changes ==
+09/12/2010
+- brand change
 
 30/08/2010
 - version 0.3
