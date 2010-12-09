@@ -177,7 +177,7 @@ function faq_insert($data) {
 
     $table_name = $wpdb->prefix . "faq";
     $wpdb->insert( $table_name,
-		  array( 'question' => $data['question'], 'answer' => $data['answer'], 'author_id' => $current_user->ID),
+		  array( 'question' => stripslashes_deep($data['question']), 'answer' => stripslashes_deep($data['answer']), 'author_id' => $current_user->ID),
 		  array( '%s', '%s', '%d' ) );
     $msg = __("Entry added");
     return $msg;
