@@ -3,8 +3,8 @@
 Plugin Name: Simple FAQ
 Plugin URI: http://www.spidersoft.com.au/2010/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
-Version: 0.3
-Author: Slawomir Jasinski
+Version: 0.4
+Author: Slawomir Jasinski - SpiderSoft
 Author URI: http://www.spidersoft.com.au/
 License: GPL2
 
@@ -27,6 +27,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 $faq_db_version = "0.3";
 
+/**
+ * install FAQ and create database for it
+ */
 function faq_install () {
    global $wpdb;
    global $faq_db_version;
@@ -70,17 +73,17 @@ function DisplayFAQ() {
     $select = "SELECT * FROM " . $table_name ." ORDER BY answer_date DESC";
     $all_faq = $wpdb->get_results($select);
 
-    $buf = '<ol>';
+    $buf = '<ol class="simple-faq">';
     foreach ($all_faq as $q) {
-	$buf .= '<li>' . format_to_post( $q->question ). '<br/>';
-	$buf .= format_to_post( $q->answer ).'</li>';
+	$buf .= '<li>' . format_to_post( $q->question ). '<br/><span class="sf-answer">';
+	$buf .= format_to_post( $q->answer ).'</span></li>';
     }
     $buf .= '</ol>';
 
     return $buf;
 }
 
-    add_shortcode('display_faq', 'DisplayFAQ');
+   add_shortcode('display_faq', 'DisplayFAQ');
 
 
 /**
