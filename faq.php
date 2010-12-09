@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Simple FAQ
-Plugin URI: http://www.jasinski.us/simple-faq/
+Plugin URI: http://www.spidersoft.com.au/2010/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
-Version: 0.3
-Author: Slawomir Jasinski
-Author URI: http://www.jasinski.us
+Version: 0.4
+Author: Slawomir Jasinski - SpiderSoft
+Author URI: http://www.spidersoft.com.au/
 License: GPL2
 
 Copyright 2009-2010 Slawomir Jasinski  (email : slav123@gmail.com)
@@ -27,6 +27,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 $faq_db_version = "0.3";
 
+/**
+ * install FAQ and create database for it
+ */
 function faq_install () {
    global $wpdb;
    global $faq_db_version;
@@ -70,17 +73,17 @@ function DisplayFAQ() {
     $select = "SELECT * FROM " . $table_name ." ORDER BY answer_date DESC";
     $all_faq = $wpdb->get_results($select);
 
-    $buf = '<ol>';
+    $buf = '<ol class="simple-faq">';
     foreach ($all_faq as $q) {
-	$buf .= '<li>' . format_to_post( $q->question ). '<br/>';
-	$buf .= format_to_post( $q->answer ).'</li>';
+	$buf .= '<li>' . format_to_post( $q->question ). '<br/><span class="sf-answer">';
+	$buf .= format_to_post( $q->answer ).'</span></li>';
     }
     $buf .= '</ol>';
 
     return $buf;
 }
 
-    add_shortcode('display_faq', 'DisplayFAQ');
+   add_shortcode('display_faq', 'DisplayFAQ');
 
 
 /**
@@ -103,34 +106,34 @@ function faq_main() {
 	 case 'edit':
 	    $msg = faq_form('update', $_REQUEST['id']);
 	 break;
-   
+
 	 case 'new':
 	    $msg = faq_form('insert');
 	 break;
-   
+
 	 case 'delete':
 	    $msg = faq_delete($_REQUEST['id']);
 	 break;
-   
+
 	 case 'update':
 	    $msg = faq_update($_POST);
 	 break;
-   
+
 	 case 'insert':
 	    $msg = faq_insert($_POST);
 	 break;
-   
+
 	 case 'view':
 	    faq_view($_REQUEST['id']);
 	 break;
-   
+
 	 default:
 	    faq_list();
 	 break;
       }
    else
       faq_list();
-   
+
    if (!empty($msg)) {
       echo '<p>' . draw_ico('back to list', 'Backward.png', 'plugins.php?page=faq') . '</p>';
       _e("Message: ") ;
@@ -148,7 +151,7 @@ function faq_delete($id) {
 
    $results = $wpdb->query("DELETE FROM " . $table_name . " WHERE id='$id'");
    if ($results) {
-      $msg = __("FAQ entry was suceffuly deleted.");
+      $msg = __("FAQ entry was successfully deleted.");
    }
    return $msg;
 }
