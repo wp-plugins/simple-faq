@@ -3,8 +3,8 @@ Contributors: slav123
 Donate link: http://www.spidersoft.com.au/2010/simple-faq/
 Tags: faq, question, answer, simple
 Requires at least: 2.7
-Tested up to: 3.0.3
-Stable tag: 0.4
+Tested up to: 3.0.5
+Stable tag: 0.5
 
 Simple FAQ gives you ability to create very simple FAQ on your site (questions and answers)
 
@@ -14,13 +14,13 @@ Simple FAQ gives you ability to create very simple FAQ on your site (questions a
 
 == Installation ==
 
-1. Unzip the package and upload the Simple FAQ directory into your wp-content/plugins directory of your WordPress installation
-2. Activate the plugin at the plugin from plugins page
-3. Put the short code `[display_faq]` in your page
+1. Unzip the package and upload the Simple FAQ directory into your wp-content/plugins directory of your WordPress installation.
+2. Activate the plugin at the plugin from plugins page.
+3. Put the short code `[display_faq]` in your page.
 
 == Frequently Asked Questions ==
 
-= How i can change styles of it? =
+= How I can change styles of it? =
 
 Currently Simple FAQ uses only two classes: `simple-faq` for `<ol>` element and `sf-answer` for `<span>` element with answer.
 
@@ -28,11 +28,22 @@ Currently Simple FAQ uses only two classes: `simple-faq` for `<ol>` element and 
 
 Because that is general idea. If you want more functions - put post on forum and I'll consider code improvement.
 
+= Can you extend this plugin? =
+
+If yoy have any ideas - just let me know.
+
 == Screenshots ==
 
 1. admin panel
+2. post editing
 
 == Changelog ==
+
+= 0.5 =
+* 10/02/2010
+* small bug fixing (slashes)
+* change width of text input
+* more columns displayed on admin page
 
 = 0.4 =
 * 09/12/2010

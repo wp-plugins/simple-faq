@@ -70,7 +70,7 @@ function DisplayFAQ() {
     global $wpdb;
     $table_name = $wpdb->prefix . "faq";
 
-    $select = "SELECT * FROM " . $table_name ." ORDER BY answer_date DESC";
+    $select = "SELECT * FROM {$table_name} ORDER BY answer_date DESC";
     $all_faq = $wpdb->get_results($select);
 
     $buf = '<ol class="simple-faq">';
@@ -135,7 +135,7 @@ function faq_main() {
       faq_list();
 
    if (!empty($msg)) {
-      echo '<p>' . draw_ico('back to list', 'Backward.png', 'plugins.php?page=faq') . '</p>';
+      echo '<p>' . draw_ico(__('back to list'), 'Backward.png', '') . '</p>';
       _e("Message: ") ;
       echo $msg;
    }
@@ -149,7 +149,7 @@ function faq_delete($id) {
    global $wpdb;
    $table_name = $wpdb->prefix . "faq";
 
-   $results = $wpdb->query("DELETE FROM " . $table_name . " WHERE id='$id'");
+   $results = $wpdb->query("DELETE FROM {$table_name} WHERE id='$id'");
    if ($results) {
       $msg = __("FAQ entry was successfully deleted.");
    }
@@ -160,10 +160,13 @@ function faq_delete($id) {
  * update entry in database
  */
 function faq_update($data) {
-    global $wpdb;
+    global $wpdb, $current_user;
     $table_name = $wpdb->prefix . "faq";
     $wpdb->update($table_name,
-		  array( 'question' => $data['question'], 'answer' => $data['answer']),
+		  array( 'question' => stripslashes_deep($data['question']),
+			'answer' => stripslashes_deep($data['answer']),
+			'answer_date' => date("Y-m-d"),
+			'author_id' => $current_user->ID),
 		  array( 'id' => $data['hid']));
     $msg = __("Question and answer updated");
     return $msg;
@@ -177,8 +180,12 @@ function faq_insert($data) {
 
     $table_name = $wpdb->prefix . "faq";
     $wpdb->insert( $table_name,
-		  array( 'question' => stripslashes_deep($data['question']), 'answer' => stripslashes_deep($data['answer']), 'author_id' => $current_user->ID),
-		  array( '%s', '%s', '%d' ) );
+		  array(
+			'question' => stripslashes_deep($data['question']),
+			'answer' => stripslashes_deep($data['answer']),
+			'answer_date' => date("Y-m-d"),
+			'author_id' => $current_user->ID),
+		  array( '%s', '%s', '%s', '%d' ) );
     $msg = __("Entry added");
     return $msg;
 }
@@ -187,9 +194,7 @@ function faq_insert($data) {
  * draw small ico
  */
 function draw_ico($text, $gfx, $url) {
-   $m = '<a href="' .$_SERVER['REQUEST_URI']. $url . '">';
-   $m .= '<img src="../wp-content/plugins/simple-faq/gfx/' . $gfx .'" width="18" height="18" alt="+" align="middle"/> ' . $text . '</a>';
-   return $m;
+   return '<a href="?page=faq.php'.$url . '" style="text-decoration: none"><img src="../wp-content/plugins/simple-faq/gfx/' . $gfx .'" width="18" height="18" alt="+" style="vertical-align: middle; margin: 0 5px 0 0"/>' . $text . '</a>';
 }
 
 /**
@@ -197,21 +202,21 @@ function draw_ico($text, $gfx, $url) {
  */
 
 function faq_list() {
-   global $wpdb;
+   global $wpdb, $current_user;
    $table_name = $wpdb->prefix . "faq";
 
    echo '<h3>List of entries.</h3>';
-   echo '<p>';
-   echo draw_ico('add new entry', 'add.png', '&amp;act=new');
-   echo '</a></p>';
+   echo '<p>' . draw_ico(__('add new entry'), 'add.png', '&amp;act=new') . '</p>';
 
 
-   $select = "SELECT id, question, answer FROM " . $table_name ." ORDER BY answer_date DESC";
+   $select = "SELECT id, question, answer, author_id, answer_date FROM {$table_name} ORDER BY answer_date DESC";
    $all_faq = $wpdb->get_results($select);
 
    ?><table class="widefat">
    <thead>
       <th scope="col"><? _e("Question") ?></th>
+      <th scope="col"><? _e("Created") ?></th>
+      <th scope="col"><? _e("Author") ?></th>
       <th scope="col" width="30"><? _e("Edit") ?></th>
       <th scope="col" width="30"><? _e("View"); ?></th>
       <th scope="col" width="30"><? _e("Delete");?></th>
@@ -219,10 +224,16 @@ function faq_list() {
    <tbody>
    <?
 
+
     $buf = '<tr>';
     foreach ($all_faq as $q) {
+      if ($q->author_id == 0) $q->author_id = $current_user->ID;
+	 $user_info = get_userdata($q->author_id);
+
 	echo '<tr>';
 	echo '<td>' . $q->question . '</td>';
+	echo '<td>' . $q->answer_date . '</td>';
+	echo '<td>' . $user_info->user_login . '</td>';
 	echo '<td>' . draw_ico('', 'tool.png', '&amp;id=' . $q->id . '&amp;act=edit') . '</td>';
 	echo '<td>' . draw_ico('', 'zoom.png', '&amp;id=' . $q->id . '&amp;act=view') . '</td>';
 	echo '<td>' . draw_ico('', 'del.png', '&amp;id=' . $q->id . '&amp;act=delete') . '</td>';
@@ -237,7 +248,7 @@ function faq_view($id) {
    global $wpdb;
    $table_name = $wpdb->prefix . "faq";
 
-   $row = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = '$id'");
+   $row = $wpdb->get_row("SELECT * FROM {$table_name} WHERE id = '$id'");
    echo '<p>';
    _e("Question:");
    echo '<br/>';
@@ -246,7 +257,7 @@ function faq_view($id) {
    _e("Answer:");
    echo '<br/>';
    echo $row->answer;
-   echo '<p>' . draw_ico('back to list', 'Backward.png', 'plugins.php?page=faq') . '</p>';
+   echo '<p>' . draw_ico(e_('back to list'), 'Backward.png', 'plugins.php?page=faq') . '</p>';
 }
 
 /**
@@ -257,7 +268,17 @@ function faq_form($act, $id = null) {
     global $wpdb;
     $table_name = $wpdb->prefix . "faq";
 
-    $row = $wpdb->get_row("SELECT * FROM ".$table_name." WHERE id = '$id'");
+
+
+    if ($act == 'insert') {
+      $row->question = '';
+      $row->answer = '';
+      $id = null;
+    } else {
+        $row = $wpdb->get_row("SELECT * FROM {$table_name} WHERE id = '$id'");
+    }
+
+
 
     ?>
     <form name="form1" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
@@ -265,7 +286,7 @@ function faq_form($act, $id = null) {
     <input type="hidden" name="act" value="<?= $act ?>"/>
 
     <p><?php _e("Question:", 'mt_trans_domain' ); ?><br/>
-    <input type="text" name="question" value="<?= $row->question; ?>" size="20" class="regular-text">
+    <input type="text" name="question" value="<?= $row->question; ?>" size="20" class="large-text"/>
     <p><?php _e("Answer:", 'mt_trans_domain' ); ?><br/>
     <textarea name="answer" rows="10" cols="30" class="large-text"><?= $row->answer; ?></textarea>
     </p><hr />
