@@ -4,7 +4,7 @@ Donate link: http://www.spidersoft.com.au/2010/simple-faq/
 Tags: faq, question, answer, simple
 Requires at least: 2.7
 Tested up to: 3.1.1
-Stable tag: 0.5
+Stable tag: 0.6
 
 Simple FAQ gives you ability to create very simple FAQ on your site (questions and answers)
 
