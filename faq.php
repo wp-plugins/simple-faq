@@ -3,12 +3,12 @@
 Plugin Name: Simple FAQ
 Plugin URI: http://www.spidersoft.com.au/2010/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
-Version: 0.4
+Version: 0.6
 Author: Slawomir Jasinski - SpiderSoft
 Author URI: http://www.spidersoft.com.au/
 License: GPL2
 
-Copyright 2009-2010 Slawomir Jasinski  (email : slav123@gmail.com)
+Copyright 2009-2011 Slawomir Jasinski  (email : slav123@gmail.com)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ function DisplayFAQ() {
     global $wpdb;
     $table_name = $wpdb->prefix . "faq";
 
-    $select = "SELECT * FROM {$table_name} ORDER BY answer_date DESC";
+    $select = "SELECT * FROM `{$table_name}` ORDER BY answer_date DESC";
     $all_faq = $wpdb->get_results($select);
 
     $buf = '<ol class="simple-faq">';
@@ -214,12 +214,12 @@ function faq_list() {
 
    ?><table class="widefat">
    <thead>
-      <th scope="col"><? _e("Question") ?></th>
-      <th scope="col"><? _e("Created") ?></th>
-      <th scope="col"><? _e("Author") ?></th>
-      <th scope="col" width="30"><? _e("Edit") ?></th>
-      <th scope="col" width="30"><? _e("View"); ?></th>
-      <th scope="col" width="30"><? _e("Delete");?></th>
+      <th scope="col"><?php _e("Question") ?></th>
+      <th scope="col"><?php _e("Created") ?></th>
+      <th scope="col"><?php _e("Author") ?></th>
+      <th scope="col" width="30"><?php _e("Edit") ?></th>
+      <th scope="col" width="30"><?php _e("View"); ?></th>
+      <th scope="col" width="30"><?php _e("Delete");?></th>
    </thead>
    <tbody>
    <?
@@ -248,7 +248,7 @@ function faq_view($id) {
    global $wpdb;
    $table_name = $wpdb->prefix . "faq";
 
-   $row = $wpdb->get_row("SELECT * FROM {$table_name} WHERE id = '$id'");
+   $row = $wpdb->get_row("SELECT * FROM `{$table_name}` WHERE id = '$id'");
    echo '<p>';
    _e("Question:");
    echo '<br/>';
@@ -257,7 +257,7 @@ function faq_view($id) {
    _e("Answer:");
    echo '<br/>';
    echo $row->answer;
-   echo '<p>' . draw_ico(e_('back to list'), 'Backward.png', 'plugins.php?page=faq') . '</p>';
+   echo '<p>' . draw_ico(_e('back to list'), 'Backward.png', 'plugins.php?page=faq') . '</p>';
 }
 
 /**
@@ -275,26 +275,22 @@ function faq_form($act, $id = null) {
       $row->answer = '';
       $id = null;
     } else {
-        $row = $wpdb->get_row("SELECT * FROM {$table_name} WHERE id = '$id'");
+        $row = $wpdb->get_row("SELECT * FROM `{$table_name}` WHERE id = '$id'");
     }
 
 
 
     ?>
     <form name="form1" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
-    <input type="hidden" name="hid" value="<?= $id ?>"/>
-    <input type="hidden" name="act" value="<?= $act ?>"/>
+    <input type="hidden" name="hid" value="<?php echo $id ?>"/>
+    <input type="hidden" name="act" value="<?php echo $act ?>"/>
 
     <p><?php _e("Question:", 'mt_trans_domain' ); ?><br/>
-    <input type="text" name="question" value="<?= $row->question; ?>" size="20" class="large-text"/>
+    <input type="text" name="question" value="<?php echo $row->question; ?>" size="20" class="large-text"/>
     <p><?php _e("Answer:", 'mt_trans_domain' ); ?><br/>
-    <textarea name="answer" rows="10" cols="30" class="large-text"><?= $row->answer; ?></textarea>
+    <textarea name="answer" rows="10" cols="30" class="large-text"><?php echo $row->answer; ?></textarea>
     </p><hr />
-
-    <p class="submit">
-    <input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" />
-    </p>
-
+    <p class="submit"><input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" /></p>
     </form>
 <?}
 

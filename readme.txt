@@ -3,7 +3,7 @@ Contributors: slav123
 Donate link: http://www.spidersoft.com.au/2010/simple-faq/
 Tags: faq, question, answer, simple
 Requires at least: 2.7
-Tested up to: 3.0.5
+Tested up to: 3.1.1
 Stable tag: 0.5
 
 Simple FAQ gives you ability to create very simple FAQ on your site (questions and answers)
@@ -38,6 +38,10 @@ If yoy have any ideas - just let me know.
 2. post editing
 
 == Changelog ==
+= 0.6 =
+* 19/04/2011
+* removed as shortcodes
+* extra slashes in quries
 
 = 0.5 =
 * 10/02/2010
