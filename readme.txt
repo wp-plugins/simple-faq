@@ -37,13 +37,12 @@ If you have any ideas - just let me know.
 1. admin panel
 2. post editing
 
-== Comming soon ==
-* pagination
-* authors
-* sorting options
-
 == Changelog ==
 
+= future =
+* pagination,
+* authors,
+* sorting
 
 = 1.0 =
 * 08/09/2011

@@ -392,11 +392,12 @@ function faq_form($act, $id = null) {
     <input type="text" name="question" value="<?php echo $row->question; ?>" size="20" class="large-text"/>
     <p><?php _e("Answer:", 'mt_trans_domain' ); ?><br/>
     <textarea name="answer" rows="10" cols="30" class="large-text"><?php echo $row->answer; ?></textarea>
-    </p><hr />
+    </p>
     <p>
       <label><input type="radio" name="status" value="0" <?php if($row->status == 0) echo "checked" ?>> <?php echo __("Draft") ?></label> <label><input type="radio" name="status" value="1" <?php if($row->status == 1) echo "checked" ?>> <?php echo __("Published") ?></label> 
     </p>
-    <p class="submit"><input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" /></p>
+    <hr />
+    <p class="submit"><a href="plugins.php?page=faq">&laquo; <?php echo __('cancel changes') ?> <input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" /></p>
     </form>
 <?}
 
