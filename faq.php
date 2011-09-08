@@ -248,13 +248,6 @@ function faq_insert($data) {
 }
 
 /**
- * draw small ico
- */
-function draw_ico($text, $gfx, $url) {
-   return '<a href="?page=faq.php'.$url . '" style="text-decoration: none"><img src="../wp-content/plugins/simple-faq/gfx/' . $gfx .'" width="18" height="18" alt="+" style="vertical-align: middle; margin: 0 5px 0 0"/>' . $text . '</a>';
-}
-
-/**
  * show entries from database
  */
 
@@ -270,12 +263,12 @@ function faq_list() {
    <div class="tablenav top">
       <div class="alignleft actions">
 	 <select name="action" id="faq_action">
-	    <option value="-1" selected="selected">Bulk Actions</option>
-	    <option value="publish">Publish</option>
-	    <option value="unpublish">Unpublish</option>
-	    <option value="trash">Move to Trash</option>
+	    <option value="-1" selected="selected"><?php echo __("Bulk Actions") ?></option>
+	    <option value="publish"><?php echo __("Publish") ?></option>
+	    <option value="unpublish"><?php echo __("Unpublish") ?></option>
+	    <option value="trash"><?php echo __("Move to Trash") ?></option>
 	 </select>
-	 <input type="submit" name="" id="doaction" class="button-secondary action" value="Apply">
+	 <input type="submit" name="" id="doaction" class="button-secondary action" value="<?php echo __("Apply") ?>">
       </div>
    </div>	
    
@@ -401,7 +394,7 @@ function faq_form($act, $id = null) {
     <textarea name="answer" rows="10" cols="30" class="large-text"><?php echo $row->answer; ?></textarea>
     </p><hr />
     <p>
-      <label><input type="radio" name="status" value="0" <?php if($row->status == 0) echo "checked" ?>> Draft</label> <label><input type="radio" name="status" value="1" <?php if($row->status == 1) echo "checked" ?>> Published</label> 
+      <label><input type="radio" name="status" value="0" <?php if($row->status == 0) echo "checked" ?>> <?php echo __("Draft") ?></label> <label><input type="radio" name="status" value="1" <?php if($row->status == 1) echo "checked" ?>> <?php echo __("Published") ?></label> 
     </p>
     <p class="submit"><input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" /></p>
     </form>

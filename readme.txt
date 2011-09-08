@@ -30,7 +30,7 @@ Because that is general idea. If you want more functions - put post on forum and
 
 = Can you extend this plugin? =
 
-If yoy have any ideas - just let me know.
+If you have any ideas - just let me know.
 
 == Screenshots ==
 
