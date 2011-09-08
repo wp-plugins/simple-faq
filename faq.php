@@ -3,7 +3,7 @@
 Plugin Name: Simple FAQ
 Plugin URI: http://www.spidersoft.com.au/2010/simple-faq/
 Description: Simple plugin which creates editable FAQ on your site
-Version: 0.6
+Version: 1.0
 Author: Slawomir Jasinski - SpiderSoft
 Author URI: http://www.spidersoft.com.au/
 License: GPL2
@@ -25,7 +25,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-$faq_db_version = "0.3";
+$faq_db_version = "0.4";
 
 /**
  * install FAQ and create database for it
@@ -35,32 +35,48 @@ function faq_install () {
    global $faq_db_version;
 
    $table_name = $wpdb->prefix . "faq";
-   if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
+   $installed_ver = get_option( "faq_db_version" );
+   
+   if($wpdb->get_var("show tables like '$table_name'") != $table_name || $installed_ver != $faq_db_version) {
 
-      $sql = "CREATE TABLE " . $table_name . " (
+       $sql = "CREATE TABLE " . $table_name . " (
 	`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
 	`author_id` INT NOT NULL ,
 	`question_date` DATE NOT NULL ,
 	`question` TEXT NOT NULL ,
 	`answer_date` DATE NOT NULL ,
-	`answer` TEXT NOT NULL
+	`answer` TEXT NOT NULL,
+	`status` TINYINT NOT NULL
 	) ENGINE = MYISAM CHARACTER SET utf8 COLLATE utf8_general_ci;";
 
       require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
       dbDelta($sql);
+      
+      update_option( "faq_db_version", $faq_db_version );
 
       $insert = "INSERT INTO " . $table_name .
-            " (author_id, question_date, question, answer_date, answer) " .
-            "VALUES ('0', '".date("Y-m-d")."','Sample question', '".date("Y-m-d")."', 'Sample answer')";
+            " (author_id, question_date, question, answer_date, answer, status) " .
+            "VALUES ('0', '".date("Y-m-d")."','Sample question', '".date("Y-m-d")."', 'Sample answer', 1)";
 
       $results = $wpdb->query( $insert );
 
-      add_option("faq_db_version", $jal_db_version);
-   }
-
-}
-
+      add_option("faq_db_version", $faq_db_version);
+   }	
+} // end faq_install
+   
    register_activation_hook(__FILE__,'faq_install');
+
+
+   /**
+    *   check if DB is up to date
+    */
+   function myplugin_update_db_check() {
+      global $faq_db_version;
+      if (get_site_option('faq_db_version') != $faq_db_version) {
+	 faq_install();
+      }
+   }
+   add_action('plugins_loaded', 'myplugin_update_db_check');
 
 /**
  * @name Display FAQ
@@ -70,7 +86,7 @@ function DisplayFAQ() {
     global $wpdb;
     $table_name = $wpdb->prefix . "faq";
 
-    $select = "SELECT * FROM `{$table_name}` ORDER BY answer_date DESC";
+    $select = "SELECT * FROM `{$table_name}` WHERE status=1 ORDER BY answer_date DESC";
     $all_faq = $wpdb->get_results($select);
 
     $buf = '<ol class="simple-faq">';
@@ -98,8 +114,16 @@ function DisplayFAQ() {
     add_action('admin_menu', 'faq_menu');
 
 function faq_main() {
-   echo '<div class="wrap">';
-   echo '<h2>Simple FAQ</h2>';
+   ?>
+   <div id="msg" style="overflow: auto"></div>
+   <div class="wrap">
+   <h2>Simple FAQ <a href="?page=faq.php&act=new" class="add-new-h2">Add New</a></h2>
+   <!--<ul class="subsubsub">
+      <li class="all"><a href="?page=faq.php" class="current">Entries </a> | </li>
+      <li class="active"><a href="?page=faq.php?act=settings">Settings </a></li>
+   </ul>-->
+   <div style="clear: both"></div>
+   <?php
 
    if (isset($_REQUEST["act"]))
       switch ($_REQUEST["act"]) {
@@ -109,6 +133,10 @@ function faq_main() {
 
 	 case 'new':
 	    $msg = faq_form('insert');
+	 break;
+      
+	 case 'bulk':
+	    faq_bulk($_REQUEST);
 	 break;
 
 	 case 'delete':
@@ -135,7 +163,7 @@ function faq_main() {
       faq_list();
 
    if (!empty($msg)) {
-      echo '<p>' . draw_ico(__('back to list'), 'Backward.png', '') . '</p>';
+      echo '<p><a href="?page=faq.php">' . __('back to list'). '</a></p>';
       _e("Message: ") ;
       echo $msg;
    }
@@ -156,6 +184,33 @@ function faq_delete($id) {
    return $msg;
 }
 
+function faq_bulk($data) {
+   $ids = '';
+   
+   if (is_array($data['faq'])) {
+      $ids = join(',', $data['faq']);
+   } else {
+      return false;
+   }
+   global $wpdb;
+   $table_name = $wpdb->prefix . "faq";
+   
+   if (!empty($ids)) {
+      switch ($data['action']) {
+	 case 'publish':
+	    $results = $wpdb->query("UPDATE {$table_name} SET status=1 WHERE id IN ({$ids})");
+	 break;
+	 case 'unpublish':
+	    $results = $wpdb->query("UPDATE {$table_name} SET status=0 WHERE id IN ({$ids})");
+	 break;
+	 case 'trash':
+	    $results = $wpdb->query("DELETE FROM {$table_name} WHERE id IN ({$ids})");
+	 break;
+      }
+   }
+
+}
+
 /**
  * update entry in database
  */
@@ -166,7 +221,8 @@ function faq_update($data) {
 		  array( 'question' => stripslashes_deep($data['question']),
 			'answer' => stripslashes_deep($data['answer']),
 			'answer_date' => date("Y-m-d"),
-			'author_id' => $current_user->ID),
+			'author_id' => $current_user->ID,
+			'status' => $data['status']),
 		  array( 'id' => $data['hid']));
     $msg = __("Question and answer updated");
     return $msg;
@@ -184,8 +240,9 @@ function faq_insert($data) {
 			'question' => stripslashes_deep($data['question']),
 			'answer' => stripslashes_deep($data['answer']),
 			'answer_date' => date("Y-m-d"),
-			'author_id' => $current_user->ID),
-		  array( '%s', '%s', '%s', '%d' ) );
+			'author_id' => $current_user->ID,
+			'status' => $data['status']),
+		  array( '%s', '%s', '%s', '%d', '%d' ) );
     $msg = __("Entry added");
     return $msg;
 }
@@ -205,42 +262,100 @@ function faq_list() {
    global $wpdb, $current_user;
    $table_name = $wpdb->prefix . "faq";
 
-   echo '<h3>List of entries.</h3>';
-   echo '<p>' . draw_ico(__('add new entry'), 'add.png', '&amp;act=new') . '</p>';
-
-
-   $select = "SELECT id, question, answer, author_id, answer_date FROM {$table_name} ORDER BY answer_date DESC";
+   $select = "SELECT id, question, answer, author_id, answer_date, status FROM {$table_name} ORDER BY answer_date DESC";
    $all_faq = $wpdb->get_results($select);
 
-   ?><table class="widefat">
+   ?>
+   <form id="faq_table" method="post" onsubmit="return faqBulkAction();">
+   <div class="tablenav top">
+      <div class="alignleft actions">
+	 <select name="action" id="faq_action">
+	    <option value="-1" selected="selected">Bulk Actions</option>
+	    <option value="publish">Publish</option>
+	    <option value="unpublish">Unpublish</option>
+	    <option value="trash">Move to Trash</option>
+	 </select>
+	 <input type="submit" name="" id="doaction" class="button-secondary action" value="Apply">
+      </div>
+   </div>	
+   
+   <input type="hidden" name="act" value="bulk"/>
+   <table class="wp-list-table widefat">
    <thead>
-      <th scope="col"><?php _e("Question") ?></th>
-      <th scope="col"><?php _e("Created") ?></th>
-      <th scope="col"><?php _e("Author") ?></th>
-      <th scope="col" width="30"><?php _e("Edit") ?></th>
-      <th scope="col" width="30"><?php _e("View"); ?></th>
-      <th scope="col" width="30"><?php _e("Delete");?></th>
+   <tr>
+      <th scope="col" class="manage-column"><input type="checkbox" id="faq_chb"></th>
+      <th scope="col" class="manage-column"><?php _e("Question") ?></th>
+      <th scope="col" class="manage-column"><?php _e("Created") ?></th>
+      <th scope="col" class="manage-column"><?php _e("Author") ?></th>
+      <th scope="col" class="manage-column"><?php _e("Status") ?></th>
+   </tr>
    </thead>
    <tbody>
-   <?
-
+   <?php
 
     $buf = '<tr>';
+    $status = array('Draft', 'Published');
     foreach ($all_faq as $q) {
       if ($q->author_id == 0) $q->author_id = $current_user->ID;
+      
 	 $user_info = get_userdata($q->author_id);
+	 $edit_link = '?page=faq.php&amp;id=' . $q->id . '&amp;act=edit';
+	 $view_link ='?page=faq.php&amp;id=' . $q->id . '&amp;act=view';
+	 $delete_link = '?page=faq.php&amp;id=' . $q->id . '&amp;act=delete';
 
 	echo '<tr>';
-	echo '<td>' . $q->question . '</td>';
+	echo '<th scope="row"><input type="checkbox" name="faq[]" value="' . $q->id . '" class="faq_chb"></th>';
+	echo "<td><strong><a href=\"{$edit_link}\" title=\"Edit question\">" . $q->question . "</a></strong>";
+	echo '<div class="row-actions">';
+	echo "<span class=\"edit\"><a href=\"{$edit_link}\" title=\"Edit this item\">Edit</a></span> | ";
+	echo "<span class=\"view\"><a href=\"{$view_link}\" title=\"View this item\">View</a></span> | ";
+	echo "<span class=\"trash\"><a href=\"{$delete_link}\" title=\"Move this item to Trash\">Trash</a></span>";
+	echo '</div>';
+	echo '</td>';
 	echo '<td>' . $q->answer_date . '</td>';
 	echo '<td>' . $user_info->user_login . '</td>';
-	echo '<td>' . draw_ico('', 'tool.png', '&amp;id=' . $q->id . '&amp;act=edit') . '</td>';
-	echo '<td>' . draw_ico('', 'zoom.png', '&amp;id=' . $q->id . '&amp;act=view') . '</td>';
-	echo '<td>' . draw_ico('', 'del.png', '&amp;id=' . $q->id . '&amp;act=delete') . '</td>';
+	echo '<td>' . $status[$q->status] . '</td>';
 	echo '</tr>';
     }
-
-    echo '</tbody></table>';
+?>
+    </tbody></table></form>
+    <script type="text/javascript">
+      function faqBulkAction(){
+	 var sdata = jQuery('#faq_table').serialize();
+	 var action = jQuery('#faq_action').val();
+	 if (action == -1) {
+	    alert('You need to chose action!');
+	    return false;
+	 }
+	 if (action == 'trash') {
+	    if (!confirm('Are you sure?')) return false;
+	 }
+	 jQuery.ajax({
+	    url: '?page=faq.php',
+	    data: sdata,
+	    type: 'POST',
+	    success: function(msg) {
+	       document.location.reload();
+	       return false;
+	    },
+	    failure: function() {
+	       alert("Error occured in ajax query");
+	       return false;
+	    }
+	 });
+	 return false;
+      }
+      
+      jQuery(document).ready(function() {
+	 jQuery('#faq_chb').bind('click', function(){
+	    var checked_status = this.checked; 
+            jQuery(".faq_chb").each(function() { 
+               this.checked = checked_status; 
+            }); 
+	 });
+      });
+    </script>
+   <?php
 
 }
 
@@ -257,7 +372,7 @@ function faq_view($id) {
    _e("Answer:");
    echo '<br/>';
    echo $row->answer;
-   echo '<p>' . draw_ico(_e('back to list'), 'Backward.png', 'plugins.php?page=faq') . '</p>';
+   echo '<p><a href="plugins.php?page=faq">&laquo; ' . __('back to list'). '</p>';
 }
 
 /**
@@ -268,8 +383,6 @@ function faq_form($act, $id = null) {
     global $wpdb;
     $table_name = $wpdb->prefix . "faq";
 
-
-
     if ($act == 'insert') {
       $row->question = '';
       $row->answer = '';
@@ -277,9 +390,6 @@ function faq_form($act, $id = null) {
     } else {
         $row = $wpdb->get_row("SELECT * FROM `{$table_name}` WHERE id = '$id'");
     }
-
-
-
     ?>
     <form name="form1" method="post" action="<?php echo str_replace( '%7E', '~', $_SERVER['REQUEST_URI']); ?>">
     <input type="hidden" name="hid" value="<?php echo $id ?>"/>
@@ -290,6 +400,9 @@ function faq_form($act, $id = null) {
     <p><?php _e("Answer:", 'mt_trans_domain' ); ?><br/>
     <textarea name="answer" rows="10" cols="30" class="large-text"><?php echo $row->answer; ?></textarea>
     </p><hr />
+    <p>
+      <label><input type="radio" name="status" value="0" <?php if($row->status == 0) echo "checked" ?>> Draft</label> <label><input type="radio" name="status" value="1" <?php if($row->status == 1) echo "checked" ?>> Published</label> 
+    </p>
     <p class="submit"><input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" class="button-primary" /></p>
     </form>
 <?}

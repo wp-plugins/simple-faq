@@ -3,8 +3,8 @@ Contributors: slav123
 Donate link: http://www.spidersoft.com.au/2010/simple-faq/
 Tags: faq, question, answer, simple
 Requires at least: 2.7
-Tested up to: 3.1.1
-Stable tag: 0.6
+Tested up to: 3.2.1
+Stable tag: 1.0
 
 Simple FAQ gives you ability to create very simple FAQ on your site (questions and answers)
 
@@ -37,7 +37,20 @@ If yoy have any ideas - just let me know.
 1. admin panel
 2. post editing
 
+== Comming soon ==
+* pagination
+* authors
+* sorting options
+
 == Changelog ==
+
+
+= 1.0 =
+* 08/09/2011
+* completly redisgned - new look and feel closer to WP 3.2 family
+* new option - status (published / draft)
+* bulk operations
+
 = 0.6 =
 * 19/04/2011
 * removed as shortcodes
