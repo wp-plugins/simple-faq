@@ -30,20 +30,19 @@ Because that is general idea. If you want more functions - put post on forum and
 
 = Can you extend this plugin? =
 
-If yoy have any ideas - just let me know.
+If you have any ideas - just let me know.
 
 == Screenshots ==
 
 1. admin panel
 2. post editing
 
-== Comming soon ==
-* pagination
-* authors
-* sorting options
-
 == Changelog ==
 
+= future =
+* pagination,
+* authors,
+* sorting
 
 = 1.0 =
 * 08/09/2011
